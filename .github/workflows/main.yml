@@ -19,22 +19,28 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev libffi-dev uuid-dev
+        sudo apt-get install -y docutils git fontconfig libffi-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libjpeg-dev libpango1.0-dev libpangoft2-1.0-0 libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libtool pkg-config python3-dev python3-pip python3-setuptools unzip zip zlib1g-dev autoconf automake libltdl-dev libssl-dev cmake patch openjdk-17-jdk bzip2 libsqlite3-dev sqlite3 libbz2-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev uuid-dev
         pip install --upgrade pip
         pip install buildozer cython==0.29.33
 
-    - name: Initialize Buildozer
-      run: buildozer init
-
-    - name: Configure buildozer.spec
+    - name: Run Buildozer Init
       run: |
-        sed -i 's/requirements = python3,kivy/requirements = python3,kivy/g' buildozer.spec
-        sed -i 's/#source.include_exts = py,png,jpg,kv,atlas/source.include_exts = py,png,jpg,kv,atlas/g' buildozer.spec
+        buildozer init
 
-    - name: Build Android APK
+    - name: Modify Buildozer Spec
+      run: |
+        # App details automatically edit karne ke liye
+        sed -i 's/^title = .*/title = My Reminder App/' buildozer.spec
+        sed -i 's/^package.name = .*/package.name = reminderapp/' buildozer.spec
+        sed -i 's/^requirements = .*/requirements = python3,kivy/' buildozer.spec
+        sed -i 's/^#source.include_exts = .*/source.include_exts = py,png,jpg,kv,atlas/' buildozer.spec
+
+    - name: Build Android APK with Buildozer
       run: |
         export APP_ANDROID_ARCHS="armeabi-v7a"
         buildozer -v android debug
+      env:
+        ACCEPT_SDK_LICENSE: "y"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
