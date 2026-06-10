@@ -29,18 +29,21 @@ jobs:
 
     - name: Modify Buildozer Spec
       run: |
-        # App details automatically edit karne ke liye
         sed -i 's/^title = .*/title = My Reminder App/' buildozer.spec
         sed -i 's/^package.name = .*/package.name = reminderapp/' buildozer.spec
         sed -i 's/^requirements = .*/requirements = python3,kivy/' buildozer.spec
         sed -i 's/^#source.include_exts = .*/source.include_exts = py,png,jpg,kv,atlas/' buildozer.spec
 
+    - name: Auto Accept Android Licenses
+      run: |
+        # Ye line automatic saare Android SDK licenses ko 'yes' bolkar accept kar legi
+        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+        echo -e "247a1c1766904d24a41f192214954554df551421\n84831b9409646a918e30573bab4c9c91346d8ec1\n504667f4c0de7af1a06de9f4b1727b84351f2910\nd56f5187479451eabf01fb74314b50d2481b556d\n27444a5231b390a47920e7f226b625a4722759c7\n94bb6f79a14b609d2644e86e3b367d2d1404b276\n85c1f871556350f19d288d6fd182413e1858759a" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
     - name: Build Android APK with Buildozer
       run: |
         export APP_ANDROID_ARCHS="armeabi-v7a"
         buildozer -v android debug
-      env:
-        ACCEPT_SDK_LICENSE: "y"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
